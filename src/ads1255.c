@@ -139,47 +139,12 @@ void ADS125X_ADC_Code2Volt (ADS125X_t *ads, int32_t *pCode, float *pVolt, uint16
   * @return <float> voltage value on analog input
   * @see    Datasheet Fig. 30 RDATA Command Sequence
   */
-		
-/* LIBRARY MACHEN SO: */
-/* ALI NIX SCHULD: */
 float ADS125X_ADC_ReadVolt (ADS125X_t *ads){
 	uint8_t spiRx[3] = {0,0,0};
 	spiRx[0] = ADS125X_CMD_RDATA;
 	
-	ADS125X_CS(ads, 1);
-	ADS125X_DRDY_Wait(ads);
-	HAL_SPI_Transmit(ads->hspix, spiRx, 1, 10);
-	HAL_Delay(1);
-	HAL_SPI_Receive(ads->hspix, spiRx, 3, 10);
-	ADS125X_CS(ads, 0);
+	/** @todo is SYNC and WAKEUP required? */
 	
-#ifdef DEBUG_ADS1255
-	printf("RDATA: %#.2x%.2x%.2x\n", spiRx[0], spiRx[1], spiRx[2]);
-#endif
-	
-	// must be signed integer for 2's complement to work
-	int32_t adsCode = (spiRx[0] << 16) | (spiRx[1] << 8) | (spiRx[2]);
-  if(adsCode & 0x800000) adsCode |= 0xff000000;  // fix 2's complement
-	// do all calculations in float. don't change the order of factors --> (adsCode/0x7fffff) will always return 0
-	return ( (float)adsCode * (2.0f * ads->vref) ) / ( ads->pga * 8388607.0f );  // 0x7fffff = 8388607.0f
-}
-
-float ADS125X_Lego(ADS125X_t *ads, uint8_t p_chan, uint8_t n_chan){
-	// uint8_t channels = ((p_chan << 4)&0xF0) | (n_chan & 0x0F);
-  ADS125X_Register_Write(ads, ADS125X_REG_MUX, p_chan | n_chan);
-	HAL_Delay(1);
-  ADS125X_CMD_Send(ads, ADS125X_CMD_SYNC);
-	HAL_Delay(1);
-  ADS125X_CMD_Send(ads, ADS125X_CMD_WAKEUP);
-	HAL_Delay(1);
-#ifdef DEBUG_ADS1255
-	uint8_t tmp = 0;
-	ADS125X_Register_Read(ads, ADS125X_REG_MUX, &tmp, 1);
-	printf("MUX  : %#.2x\n", tmp);
-#endif
-	
-	uint8_t spiRx[3] = {0,0,0};
-	spiRx[0] = ADS125X_CMD_RDATA;
 	ADS125X_CS(ads, 1);
 	ADS125X_DRDY_Wait(ads);
 	HAL_SPI_Transmit(ads->hspix, spiRx, 1, 10);

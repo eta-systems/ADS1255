@@ -203,7 +203,6 @@ uint8_t  ADS125X_Register_Write  (ADS125X_t *ads, uint8_t reg, uint8_t data);
 uint8_t  ADS125X_CMD_Send        (ADS125X_t *ads, uint8_t cmd);
 void     ADS125X_ADC_Code2Volt   (ADS125X_t *ads, int32_t *pCode, float *pVolt, uint16_t size);
 float    ADS125X_ADC_ReadVolt    (ADS125X_t *ads);
-float ADS125X_Lego(ADS125X_t *ads, uint8_t p_chan, uint8_t n_chan);
 
 void     ADS125X_Channel_Set     (ADS125X_t *ads, int8_t chan);
 uint8_t  ADS125X_ChannelDiff_Set (ADS125X_t *ads, int8_t p_chan, int8_t n_chan);
