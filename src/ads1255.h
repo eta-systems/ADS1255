@@ -41,7 +41,7 @@ SOFTWARE.
 extern "C" {
 #endif
 
-#define STM32F4
+#define STM32F7
 
 #if defined(STM32F1)
 #include "stm32f1xx_hal.h"

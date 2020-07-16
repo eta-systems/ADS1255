@@ -36,7 +36,7 @@ SOFTWARE.
 #include <stdint.h>
 #include "ads1255.h"
 
-// #define DEBUG_ADS1255
+//#define DEBUG_ADS1255
 
 #ifdef DEBUG_ADS1255
 #include <stdio.h>
@@ -109,10 +109,9 @@ uint8_t ADS125X_DRDY_Wait(ADS125X_t *ads){
   */
 uint8_t ADS125X_CS(ADS125X_t *ads, uint8_t on)
 {
-  if(on)
-		HAL_GPIO_WritePin(ads->csPort, ads->csPin, GPIO_PIN_RESET);
-  else
-		HAL_GPIO_WritePin(ads->csPort, ads->csPin, GPIO_PIN_SET);
+  if(on) on = 0;
+  else on = 1;
+  HAL_GPIO_WritePin( ads->csPort, ads->csPin, on);
 	return 0;
 }
 
@@ -139,14 +138,14 @@ void ADS125X_ADC_Code2Volt (ADS125X_t *ads, int32_t *pCode, float *pVolt, uint16
   * @return <float> voltage value on analog input
   * @see    Datasheet Fig. 30 RDATA Command Sequence
   */
+		
+/* LIBRARY MACHEN SO: */
+/* ALI NIX SCHULD: */
 float ADS125X_ADC_ReadVolt (ADS125X_t *ads){
 	uint8_t spiRx[3] = {0,0,0};
 	spiRx[0] = ADS125X_CMD_RDATA;
 	
-	/** @todo is SYNC and WAKEUP required? */
-	
 	ADS125X_CS(ads, 1);
-	ADS125X_DRDY_Wait(ads);
 	HAL_SPI_Transmit(ads->hspix, spiRx, 1, 10);
 	HAL_Delay(1);
 	HAL_SPI_Receive(ads->hspix, spiRx, 3, 10);
@@ -263,73 +262,6 @@ uint8_t ADS125X_ChannelDiff_Set(ADS125X_t *ads, int8_t p_chan, int8_t n_chan)
   // ADS125X_CMD_Send(ads, ADS125X_CMD_WAKEUP);
   return 0;
 }
-
-
-/*
-// Call this ONLY after RDATA command
-uint32_t ADS125X_read_uint24(ADS125X_t *ads) {
-  uint8_t _highByte, _midByte, _lowByte;
-  uint32_t value;
-  uint8_t ds = ADS125X_CMD_WAKEUP;
-  HAL_SPI_TransmitReceive(ads->hspix, &ds, &_highByte, 1, 1);
-  HAL_SPI_TransmitReceive(ads->hspix, &ds, &_midByte, 1, 1);
-  HAL_SPI_TransmitReceive(ads->hspix, &ds, &_lowByte, 1, 1);
-
-  // Combine all 3-bytes to 24-bit data using byte shifting.
-  value = ((uint32_t)_highByte << 16) + ((uint32_t)_midByte << 8) + ((uint32_t)_lowByte);
-  return value;
-}
-
-// Call this ONLY after RDATA command
-uint32_t ADS125X_read_int32(ADS125X_t *ads) {
-  uint32_t value = ADS125X_read_uint24(ads);
-
-  if (value & 0x00800000) {
-    value |= 0xff000000;
-  }
-
-  return value;
-}
-
-// Call this ONLY after RDATA command
-float ADS125X_read_float32(ADS125X_t *ads) {
-  uint32_t value = ADS125X_read_int32(ads);
-  return (float)value;
-}
-
-
-float ADS125X_Read_Channel(ADS125X_t *ads) {
-  ADS125X_CS(ads, 1);
-  uint8_t ds = ADS125X_CMD_RDATA;
-  HAL_SPI_Transmit(ads->hspix, &ds, 1, 1);
-  HAL_Delay(1);  // t6
-  float adsCode = ADS125X_read_float32(ads);
-  ADS125X_CS(ads, 0);
-  return ((adsCode / 0x7FFFFF) * ((2 * ads->vref) / (float)ads->pga)) * ads->convFactor;
-}
-
-uint8_t ADS125X_ChannelDiff_Set(ADS125X_t *ads, int8_t p_chan, int8_t n_chan)
-{
-	// read back
-	uint8_t spiDat[5];
-	
-	spiDat[0] = ADS125X_CMD_WREG | ADS125X_REG_MUX;	
-	spiDat[1] = 1 -1;  // payload length = 1 bytes -1
-	//spiDat[2] = ADS125X_MUXP_AIN0 | ADS125X_MUXN_AIN1;
-	spiDat[2] = 
-	while(HAL_GPIO_ReadPin(SPI2_DRDY_GPIO_Port, SPI2_DRDY_Pin) == GPIO_PIN_SET);  // wait for DRDY to go low
-	HAL_SPI_Transmit(&hspi2, spiDat, 3, 10);
-	HAL_Delay(1);
-	// read back
-	spiDat[0] = ADS125X_CMD_RREG | ADS125X_REG_MUX;
-	spiDat[1] = 1 -1; // read 1 bytes
-	while(HAL_GPIO_ReadPin(SPI2_DRDY_GPIO_Port, SPI2_DRDY_Pin) == GPIO_PIN_SET);  // wait for DRDY to go low
-	HAL_SPI_Transmit(&hspi2, spiDat, 2, 10);
-	HAL_Delay(1);
-	HAL_SPI_Receive(&hspi2, spiRx, 1, 10);
-	printf("MUX  : %#.2x\n", spiRx[0]);
-}
-*/
 
 
 
