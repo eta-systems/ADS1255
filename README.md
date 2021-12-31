@@ -5,7 +5,7 @@
 
 This library is made for the STM32 HAL (Hardware Abstraction Library) platform. The example code is for STM32CubeMX and Keil uVision 5 IDE.
 
-Datasheet: [ti.com](https://www.ti.com/lit/ds/sbas288k/sbas288k.pdf?)
+> **Datasheet: [ti.com](https://www.ti.com/lit/ds/sbas288k/sbas288k.pdf?)**
 
 ---
 
@@ -75,6 +75,7 @@ int main(void)
 
 ### License 
 
-TBD...
+Apache 2.0 
 
+(c) 2022 eta Systems GmbH
 
